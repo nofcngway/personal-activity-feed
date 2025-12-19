@@ -52,12 +52,11 @@ make run
 
 ### Auth & Actions
 *   **URL**: [http://localhost:8082/docs/](http://localhost:8082/docs/)
-*   **JSON**: [http://localhost:8082/swagger.json](http://localhost:8082/swagger.json)
 *   **Эндпоинты**:
     *   `POST /register`, `POST /login` — Получение токена.
     *   `POST /posts`, `POST /like/{id}`, `POST /follow/{id}` — Действия (требуют `Authorization`).
 
 ### Feed (Лента)
 *   **URL**: [http://localhost:8083/docs/](http://localhost:8083/docs/)
-*   **JSON**: [http://localhost:8083/swagger.json](http://localhost:8083/swagger.json)
-*   **Метод**: `feed_api.FeedService/GetFeed` (gRPC :50052).
+*   **Эндпоинты**:
+    *   `GET /feed` — Получение ленты.
