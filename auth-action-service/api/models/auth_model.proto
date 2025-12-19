@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package auth.models.v1;
+
+option go_package = "github.com/nofcngway/auth-action-service/internal/pb/models";
+
+message Empty {}
+
+message ActionResponse {
+  bool ok = 1;
+}
+
+message AuthRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message AuthResponse {
+  string token = 1;
+  int64 user_id = 2;
+}
+
+message LikeRequest {
+  int64 post_id = 1;
+}
+
+message FollowRequest {
+  int64 user_id = 1;
+}
+
+message CreatePostRequest {
+  int64 post_id = 1;
+}
+
+

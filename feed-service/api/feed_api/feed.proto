@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package feed.service.v1;
+
+option go_package = "github.com/nofcngway/feed-service/internal/pb/feed_api;feed_api";
+
+import "google/api/annotations.proto";
+import "models/feed_model.proto";
+
+// FeedService предоставляет методы получения ленты активности пользователя.
+service FeedService {
+  // GetFeed возвращает элементы ленты по user_id с пагинацией limit/offset.
+  rpc GetFeed(GetFeedRequest) returns (GetFeedResponse) {
+    option (google.api.http) = {
+      get: "/feed"
+    };
+  }
+}
+
+message GetFeedRequest {
+  int64 user_id = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message GetFeedResponse {
+  repeated feed.models.v1.FeedItemModel items = 1;
+}
+
+

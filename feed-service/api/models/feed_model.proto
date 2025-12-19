@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package feed.models.v1;
+
+option go_package = "github.com/nofcngway/feed-service/internal/pb/models";
+
+message FeedItemModel {
+  int64 actor_id = 1;
+  string action = 2;
+  int64 target_id = 3;
+  string created_at = 4;
+}
+
+

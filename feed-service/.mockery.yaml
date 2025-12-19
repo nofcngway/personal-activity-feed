@@ -1,0 +1,20 @@
+packages:
+  github.com/nofcngway/feed-service/internal/services/feedservice:
+    config:
+      dir: "{{.InterfaceDir}}/mocks"
+      filename: "mocks.go"
+      pkgname: "mocks"
+      structname: "{{.InterfaceName}}"
+    interfaces:
+      Storage:
+
+  github.com/nofcngway/feed-service/internal/api/feed_service_api:
+    config:
+      dir: "{{.InterfaceDir}}/mocks"
+      filename: "mocks.go"
+      pkgname: "mocks"
+      structname: "{{.InterfaceName}}"
+    interfaces:
+      FeedService:
+
+

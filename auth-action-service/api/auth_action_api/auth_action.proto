@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package auth_action.service.v1;
+
+option go_package = "github.com/nofcngway/auth-action-service/internal/pb/auth_action_api";
+
+import "google/api/annotations.proto";
+import "models/auth_model.proto";
+
+// AuthActionService предоставляет HTTP/gRPC методы для регистрации/логина и пользовательских действий.
+service AuthActionService {
+  // Register регистрирует нового пользователя и создаёт сессию (возвращает token и user_id).
+  rpc Register(auth.models.v1.AuthRequest) returns (auth.models.v1.AuthResponse) {
+    option (google.api.http) = { post: "/register" body: "*" };
+  }
+
+  // Login выполняет вход пользователя и создаёт/обновляет сессию (возвращает token и user_id).
+  rpc Login(auth.models.v1.AuthRequest) returns (auth.models.v1.AuthResponse) {
+    option (google.api.http) = { post: "/login" body: "*" };
+  }
+
+  // Logout удаляет текущую сессию по токену из заголовка Authorization.
+  rpc Logout(auth.models.v1.Empty) returns (auth.models.v1.ActionResponse) {
+    option (google.api.http) = { post: "/logout" };
+  }
+
+  // Like публикует событие лайка (требуется Authorization: Bearer <token>).
+  rpc Like(auth.models.v1.LikeRequest) returns (auth.models.v1.ActionResponse) {
+    option (google.api.http) = { post: "/like/{post_id}" };
+  }
+
+  // Follow публикует событие подписки (требуется Authorization: Bearer <token>).
+  rpc Follow(auth.models.v1.FollowRequest) returns (auth.models.v1.ActionResponse) {
+    option (google.api.http) = { post: "/follow/{user_id}" };
+  }
+
+  // CreatePost публикует событие создания поста (требуется Authorization: Bearer <token>).
+  rpc CreatePost(auth.models.v1.CreatePostRequest) returns (auth.models.v1.ActionResponse) {
+    option (google.api.http) = { post: "/posts" body: "*" };
+  }
+}
+
+

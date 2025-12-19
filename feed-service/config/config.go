@@ -1,0 +1,54 @@
+package config
+
+import (
+	"fmt"
+	"os"
+
+	"go.yaml.in/yaml/v4"
+)
+
+type Config struct {
+	GRPC     GRPCConfig     `yaml:"grpc"`
+	HTTP     HTTPConfig     `yaml:"http"`
+	Database DatabaseConfig `yaml:"database"`
+	Kafka    KafkaConfig    `yaml:"kafka"`
+}
+
+type GRPCConfig struct {
+	Addr string `yaml:"addr"`
+}
+
+type HTTPConfig struct {
+	Addr       string `yaml:"addr"`
+	SwaggerPath string `yaml:"swagger_path"`
+}
+
+type DatabaseConfig struct {
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+	DBName   string `yaml:"name"`
+	SSLMode  string `yaml:"ssl_mode"`
+}
+
+type KafkaConfig struct {
+	Brokers   []string `yaml:"brokers"`
+	TopicName string   `yaml:"topic_name"`
+	GroupID   string   `yaml:"group_id"`
+}
+
+func LoadConfig(filename string) (*Config, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read config file: %w", err)
+	}
+
+	var cfg Config
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal YAML: %w", err)
+	}
+	return &cfg, nil
+}
+
+

@@ -1,0 +1,29 @@
+grpc:
+  addr: ":50053"
+
+http:
+  addr: ":8082"
+  swagger_path: "./internal/pb/swagger/auth_action_api/auth_action.swagger.json"
+
+database:
+  host: "localhost"
+  port: 55432
+  username: "admin"
+  password: "admin"
+  name: "activity"
+  ssl_mode: "disable"
+
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+
+kafka:
+  brokers:
+    - "localhost:9092"
+  topic_name: "user-actions"
+
+security:
+  session_ttl_seconds: 3600
+
+

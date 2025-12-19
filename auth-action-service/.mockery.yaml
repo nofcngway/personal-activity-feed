@@ -1,0 +1,22 @@
+packages:
+  github.com/nofcngway/auth-action-service/internal/services/authservice:
+    config:
+      dir: "{{.InterfaceDir}}/mocks"
+      filename: "mocks.go"
+      pkgname: "mocks"
+      structname: "{{.InterfaceName}}"
+    interfaces:
+      UserStorage:
+      SessionStore:
+      Producer:
+
+  github.com/nofcngway/auth-action-service/internal/api/auth_action_service_api:
+    config:
+      dir: "{{.InterfaceDir}}/mocks"
+      filename: "mocks.go"
+      pkgname: "mocks"
+      structname: "{{.InterfaceName}}"
+    interfaces:
+      AuthService:
+
+
