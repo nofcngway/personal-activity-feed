@@ -23,31 +23,16 @@ func TestRegister_OK_CreatesUserAndSession(t *testing.T) {
 
 	st.EXPECT().
 		CreateUser(mock.Anything, "u1", mock.Anything).
-		Run(func(_ context.Context, _ string, passwordHash string) {
-			if passwordHash == "" || passwordHash == "p1" {
-				t.Fatalf("expected hashed password")
-			}
-		}).
 		Return(int64(10), nil).
 		Once()
 
 	ss.EXPECT().
 		Get(mock.Anything, mock.Anything).
-		RunAndReturn(func(_ context.Context, _ string) (*sessions.Session, error) { return nil, redis.Nil }).
+		Return((*sessions.Session)(nil), redis.Nil).
 		Maybe()
 
-	var setToken string
 	ss.EXPECT().
 		Set(mock.Anything, mock.Anything, mock.Anything, 2*time.Hour).
-		Run(func(_ context.Context, token string, sess sessions.Session, ttl time.Duration) {
-			setToken = token
-			if sess.UserID != 10 {
-				t.Fatalf("expected session userID 10, got %d", sess.UserID)
-			}
-			if ttl != 2*time.Hour {
-				t.Fatalf("expected ttl 2h, got %v", ttl)
-			}
-		}).
 		Return(nil).
 		Once()
 
@@ -59,8 +44,25 @@ func TestRegister_OK_CreatesUserAndSession(t *testing.T) {
 	if userID != 10 || token == "" {
 		t.Fatalf("unexpected token/userID: token=%q userID=%d", token, userID)
 	}
+
+	createUserArgs := lastCallArgs(t, st.Calls, "CreateUser")
+	passwordHash, _ := createUserArgs.Get(2).(string)
+	if passwordHash == "" || passwordHash == "p1" {
+		t.Fatalf("expected hashed password")
+	}
+
+	setArgs := lastCallArgs(t, ss.Calls, "Set")
+	setToken, _ := setArgs.Get(1).(string)
+	sess, _ := setArgs.Get(2).(sessions.Session)
+	ttl, _ := setArgs.Get(3).(time.Duration)
 	if token != setToken {
 		t.Fatalf("expected Set called with returned token=%q, got %q", token, setToken)
+	}
+	if sess.UserID != 10 {
+		t.Fatalf("expected session userID 10, got %d", sess.UserID)
+	}
+	if ttl != 2*time.Hour {
+		t.Fatalf("expected ttl 2h, got %v", ttl)
 	}
 }
 
@@ -165,9 +167,7 @@ func TestActions_InvalidIDs_ReturnInvalidArgument(t *testing.T) {
 	ss := svc_mocks.NewSessionStore(t)
 	ss.EXPECT().
 		Get(mock.Anything, mock.Anything).
-		RunAndReturn(func(_ context.Context, _ string) (*sessions.Session, error) {
-			return &sessions.Session{UserID: 1, CreatedAt: now}, nil
-		}).
+		Return(&sessions.Session{UserID: 1, CreatedAt: now}, nil).
 		Maybe()
 
 	svc := New(
@@ -220,19 +220,33 @@ func TestNew_DefaultSessionTTL_IsHour(t *testing.T) {
 	st.EXPECT().CreateUser(mock.Anything, "u", mock.Anything).Return(int64(1), nil).Once()
 	ss.EXPECT().
 		Get(mock.Anything, mock.Anything).
-		RunAndReturn(func(_ context.Context, _ string) (*sessions.Session, error) { return nil, redis.Nil }).
+		Return((*sessions.Session)(nil), redis.Nil).
 		Maybe()
 
-	gotTTL := time.Duration(0)
 	ss.EXPECT().
 		Set(mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-		Run(func(_ context.Context, _ string, _ sessions.Session, ttl time.Duration) { gotTTL = ttl }).
 		Return(nil).
 		Once()
 
 	svc := New(st, ss, prod, 0)
 	_, _, _ = svc.Register(context.Background(), "u", "p")
+
+	setArgs := lastCallArgs(t, ss.Calls, "Set")
+	gotTTL, _ := setArgs.Get(3).(time.Duration)
 	if gotTTL != time.Hour {
 		t.Fatalf("expected default ttl 1h, got %v", gotTTL)
 	}
+}
+
+func lastCallArgs(t *testing.T, calls []mock.Call, method string) mock.Arguments {
+	t.Helper()
+
+	for i := len(calls) - 1; i >= 0; i-- {
+		if calls[i].Method == method {
+			return calls[i].Arguments
+		}
+	}
+
+	t.Fatalf("expected %q to be called", method)
+	return nil
 }
