@@ -11,6 +11,7 @@ import (
 type UserStorage interface {
 	CreateUser(ctx context.Context, username, passwordHash string) (int64, error)
 	GetUserByUsername(ctx context.Context, username string) (*pgstorage.User, error)
+	UserExists(ctx context.Context, id int64) (bool, error)
 }
 
 type SessionStore interface {

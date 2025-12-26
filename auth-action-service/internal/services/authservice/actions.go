@@ -44,6 +44,15 @@ func (s *Service) Follow(ctx context.Context, token string, targetUserID int64) 
 	if targetUserID <= 0 {
 		return ErrInvalidArgument
 	}
+
+	exists, err := s.storage.UserExists(ctx, targetUserID)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return ErrUserNotFound
+	}
+
 	return s.producer.Publish(ctx, userID, "follow", targetUserID)
 }
 

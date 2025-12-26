@@ -20,7 +20,6 @@ func (s *Service) Register(ctx context.Context, username, password string) (toke
 
 	userID, err = s.storage.CreateUser(ctx, username, string(hash))
 	if err != nil {
-		// упрощенно: считаем, что любая ошибка создания = already exists/конфликт
 		return "", 0, ErrUserAlreadyExists
 	}
 

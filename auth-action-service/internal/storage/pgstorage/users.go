@@ -60,4 +60,25 @@ func (s *PGStorage) GetUserByUsername(ctx context.Context, username string) (*Us
 	return &u, nil
 }
 
+func (s *PGStorage) UserExists(ctx context.Context, id int64) (bool, error) {
+	q := squirrel.Select("1").
+		From(usersTable).
+		Where(squirrel.Eq{"id": id}).
+		Limit(1).
+		PlaceholderFormat(squirrel.Dollar)
 
+	sql, args, err := q.ToSql()
+	if err != nil {
+		return false, err
+	}
+
+	var dummy int
+	err = s.db.QueryRow(ctx, sql, args...).Scan(&dummy)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}

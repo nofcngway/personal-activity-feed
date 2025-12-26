@@ -18,6 +18,8 @@ func mapErr(err error) error {
 		return status.Error(codes.Unauthenticated, "invalid credentials")
 	case errors.Is(err, authservice.ErrUnauthorized):
 		return status.Error(codes.Unauthenticated, "unauthorized")
+	case errors.Is(err, authservice.ErrUserNotFound):
+		return status.Error(codes.NotFound, "user not found")
 	default:
 		return status.Error(codes.Internal, "internal")
 	}
