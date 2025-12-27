@@ -3,6 +3,7 @@ package producer
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -56,7 +57,7 @@ func (p *Producer) Publish(ctx context.Context, userID int64, action string, tar
 	}
 
 	msg := kafka.Message{
-		Key:   []byte(ev.EventID),
+		Key:   []byte(fmt.Sprintf("%d", userID)),
 		Value: b,
 		Time:  ev.Timestamp,
 	}
