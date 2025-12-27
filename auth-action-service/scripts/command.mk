@@ -10,4 +10,6 @@ mock:
 run:
 	@configPath=./config.yaml go run ./cmd/app
 
-
+.PHONY: cov
+cov:
+	go test -cover ./internal/services/authservice/
